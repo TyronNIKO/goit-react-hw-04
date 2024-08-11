@@ -1,0 +1,9 @@
+.search-box {
+    @apply max-w-[375px]
+}
+.search-box .text {
+    @apply w-full tracking-[0.04rem]
+}
+.search-box input {
+    @apply w-full border-[1px] border-black rounded-[4px] leading-4
+}

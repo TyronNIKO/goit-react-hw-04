@@ -1,0 +1,16 @@
+.card {
+    @apply flex justify-between items-center p-[10px] border-[1px] border-black rounded-[4px];
+}
+.info {
+    @apply flex flex-col gap-[5px];
+}
+.name, .phone {
+    @apply flex items-center
+}
+.name svg,
+.phone svg {
+    @apply mr-2;
+}
+.card button {
+    @apply bg-gray-100 w-fit p-2 border-[1px] border-black rounded-[4px] text-xl/[1] tracking-[-0.02rem] hover:bg-gray-200;
+}

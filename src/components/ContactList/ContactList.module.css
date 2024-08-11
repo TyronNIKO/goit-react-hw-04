@@ -1,0 +1,6 @@
+.list {
+    @apply flex flex-row flex-wrap gap-[10px]
+}
+.list li {
+    @apply w-full sm:w-[calc((100%_-_10px)_/2)] md:w-[calc((100%_-_10px_*_2)_/3)] xl:w-[calc((100%_-_10px_*_3)_/4)]
+}

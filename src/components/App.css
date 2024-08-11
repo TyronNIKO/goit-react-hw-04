@@ -1,0 +1,25 @@
+body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    font-size: 18px;
+    font-family: Inter, sans-serif;
+    line-height: 1.5;
+    letter-spacing: -0.02rem;
+}
+.container {
+    @apply mx-auto px-4;
+}
+.title {
+    @apply font-bold text-[38px] tracking-[0.01rem];
+}
+.form-section {
+    @apply pt-6
+}
+.search-section {
+    @apply pt-8
+}
+.contactlist-section {
+    @apply pt-8
+}
