@@ -1,0 +1,10 @@
+.loadmorebtn {
+  position: fixed;
+  right:0;
+  bottom: 10px;
+  left: 0;
+  z-index: 11;
+  width: fit-content;
+  margin: auto;
+  @apply bg-teal-800 px-3 py-1 text-white
+}

@@ -2,71 +2,93 @@
 import "./App.css";
 
 import {useEffect, useState} from "react";
-import Section from "./Section";
-import ContactForm from "./ContactForm/ContactForm";
-import SearchBox from "./SearchBox/SearchBox";
-import ContactList from "./ContactList/ContactList";
-import contactsData from "../contacts.json";
+import SearchBar from "./SearchBar/SearchBar";
+import ImageGallery from "./ImageGallery/ImageGallery";
+import Loader from "./Loader/Loader";
+import ErrorMessage from "./ErrorMessage/ErrorMessage";
+import LoadMoreBtn from "./LoadMoreBtn/LoadMoreBtn";
+import ImageModal from "./ImageModal/ImageModal";
+import {fetchPhoto} from "../unsplash-api.js";
+import toast, {Toaster} from "react-hot-toast";
 
-const LS = {
-    save(key, data) {
-        window.localStorage.setItem(key, JSON.stringify(data));
-    },
-    load(key) {
-        return JSON.parse(window.localStorage.getItem(key));
-    },
-};
 const App = () => {
-    const options = {
-        key: "contactsData",
-        data: contactsData,
-    };
-    const [contacts, setContacts] = useState(() => LS.load(options.key) ?? options.data);
-    const [filter, setFilter] = useState("");
+    const [search, setSearch] = useState("");
+    const [page, setPage] = useState("");
+    const [error, setError] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [photos, setPhotos] = useState([]);
+    const [isEmpty, setIsEmpty] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [modalUrl, setModalUrl] = useState("");
+    const [modalAlt, setModalAlt] = useState("");
 
-    const uniqueId = () => {
-        const lastId = contacts[contacts.length - 1].id.replace(/\D/g, "");
-        return Number(lastId);
+    const handleSubmit = e => {
+        e.preventDefault();
+        const request = e.target.elements.request.value;
+        console.log(request);
+        if (request.trim() === "") {
+            toast.error("Please enter search term!");
+            return;
+        }
+        setSearch(request);
+
+        e.target.reset();
+        setPhotos([]);
+        setError(false);
+        setLoading(true);
+        setPage(1);
+        setIsVisible(false);
+        setIsEmpty(false);
     };
 
-    const addContact = newContact => {
-        setContacts(prevContact => {
-            newContact.id = `id-${uniqueId() + 1}`;
-            // console.log(newContact);
-            return [...prevContact, newContact];
-        });
-    };
-    const removeContact = contactId => {
-        console.log(contactId);
-        setContacts(prevContact => {
-            return prevContact.filter(contact => contact.id !== contactId);
-        });
+    const onLoadMore = () => {
+        console.log("load more");
+        setPage(prevPage => prevPage + 1);
     };
 
+    const openModal = (url, alt) => {
+        setShowModal(true);
+        setModalUrl(url);
+        setModalAlt(alt);
+    };
+    const closeModal = () => {
+        setShowModal(false);
+        setModalUrl("");
+        setModalAlt("");
+    };
     useEffect(() => {
-        LS.save(options.key, contacts);
-    }, [contacts]);
-
-    // const showContacts = contacts.filter(contact => contact.name.toLowerCase().includes(filter.toLowerCase()));
-    const showContacts = contacts.filter(contact => {
-        const input = `${contact.name ?? ""} ${contact.number ?? ""}`;
-        return input.toLowerCase().includes(filter.toLowerCase());
-    });
-
+        if (!search) return;
+        const fetchImages = async () => {
+            setLoading(true);
+            try {
+                const data = await fetchPhoto(search, page, 15);
+                console.log(data);
+                console.log(data.results);
+                if (!data.results.length) return setIsEmpty(true);
+                setPhotos(prevImages => [...prevImages, ...data.results]);
+                setIsVisible(page < Math.ceil(data.total_pages / data.results.length));
+            } catch (error) {
+                setError(error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchImages();
+    }, [search, page]);
     return (
         <>
-            <Section name="header-section" container={true}>
-                <h1 className="title">Phonebook</h1>
-            </Section>
-            <Section name="form-section" container={true}>
-                <ContactForm onAdd={addContact} />
-            </Section>
-            <Section name="search-section" container={true}>
-                <SearchBox value={filter} onFilter={setFilter} />
-            </Section>
-            <Section name="contactlist-section" container={true}>
-                <ContactList data={showContacts} onDelete={removeContact} />
-            </Section>
+            <SearchBar onSubmit={handleSubmit} />
+            <ImageGallery images={photos} openModal={openModal} />
+            {loading && <Loader />}
+            {error && <ErrorMessage>{error}</ErrorMessage>}
+            {isVisible && (
+                <LoadMoreBtn onClick={onLoadMore} disabled={loading}>
+                    Load more
+                </LoadMoreBtn>
+            )}
+            <ImageModal modalIsOpen={showModal} src={modalUrl} alt={modalAlt} closeModal={closeModal} />
+            <Toaster position="top-right" />
         </>
     );
 };

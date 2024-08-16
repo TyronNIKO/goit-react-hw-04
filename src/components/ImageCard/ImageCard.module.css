@@ -1,0 +1,53 @@
+.imagecard {
+    position: relative;
+    /* Your styles here */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.imagecard img {
+    filter: brightness(0.7);
+    transition: 250ms ease;
+    transition-property: filter, transform;
+}
+.imagecard img:hover {
+    z-index: 1;
+    filter: brightness(1);
+    transform: scale(1.2);
+}
+.info {
+    position: absolute;
+    bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: 250ms ease;
+    transition-property: opacity;
+}
+.imagecard:hover .info {
+    opacity: 0;
+}
+.likes {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    align-items: center;
+    width: fit-content;
+    padding: 5px 5px;
+    background: rgba(19, 104, 104, .5);
+    color: #fff;
+    font-size: 14px;
+    line-height: 1;
+    text-align: center;
+}
+
+.author {
+    color: #fff;
+font-weight: 700;
+    font-size: 18px;
+    text-align: center;
+    text-transform: uppercase;
+}
