@@ -27,7 +27,7 @@ const App = () => {
     const handleSubmit = e => {
         e.preventDefault();
         const request = e.target.elements.request.value;
-        console.log(request);
+        // console.log(request);
         if (request.trim() === "") {
             toast.error("Please enter search term!");
             return;
@@ -63,8 +63,8 @@ const App = () => {
             setLoading(true);
             try {
                 const data = await fetchPhoto(search, page, 15);
-                console.log(data);
-                console.log(data.results);
+                // console.log(data);
+                // console.log(data.results);
                 if (!data.results.length) {
                     toast.error("Sorry. There is no images...");
                     return setIsEmpty(true);
