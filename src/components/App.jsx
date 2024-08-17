@@ -1,7 +1,7 @@
 // src/App.jsx
 import "./App.css";
 
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import SearchBar from "./SearchBar/SearchBar";
 import ImageGallery from "./ImageGallery/ImageGallery";
 import Loader from "./Loader/Loader";
@@ -22,6 +22,7 @@ const App = () => {
     const [showModal, setShowModal] = useState(false);
     const [modalUrl, setModalUrl] = useState("");
     const [modalAlt, setModalAlt] = useState("");
+    const scrollBlock = useRef(null);
 
     const handleSubmit = e => {
         e.preventDefault();
@@ -43,7 +44,6 @@ const App = () => {
     };
 
     const onLoadMore = () => {
-        console.log("load more");
         setPage(prevPage => prevPage + 1);
     };
 
@@ -65,7 +65,10 @@ const App = () => {
                 const data = await fetchPhoto(search, page, 15);
                 console.log(data);
                 console.log(data.results);
-                if (!data.results.length) return setIsEmpty(true);
+                if (!data.results.length) {
+                    toast.error("Sorry. There is no images...");
+                    return setIsEmpty(true);
+                }
                 setPhotos(prevImages => [...prevImages, ...data.results]);
                 setIsVisible(page < Math.ceil(data.total_pages / data.results.length));
             } catch (error) {
@@ -76,12 +79,17 @@ const App = () => {
         };
         fetchImages();
     }, [search, page]);
+    useEffect(() => {
+        // Scroll to the bottom whenever the messages array changes
+        window.scrollTo({top: document.body.scrollHeight, behavior: "smooth"});
+    }, [photos]);
     return (
-        <>
+        <div ref={scrollBlock}>
             <SearchBar onSubmit={handleSubmit} />
             <ImageGallery images={photos} openModal={openModal} />
             {loading && <Loader />}
             {error && <ErrorMessage>{error}</ErrorMessage>}
+            {isEmpty && <ErrorMessage>Sorry. There is no images...</ErrorMessage>}
             {isVisible && (
                 <LoadMoreBtn onClick={onLoadMore} disabled={loading}>
                     Load more
@@ -89,7 +97,7 @@ const App = () => {
             )}
             <ImageModal modalIsOpen={showModal} src={modalUrl} alt={modalAlt} closeModal={closeModal} />
             <Toaster position="top-right" />
-        </>
+        </div>
     );
 };
 
